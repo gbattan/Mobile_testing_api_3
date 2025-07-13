@@ -1,0 +1,40 @@
+import requests
+import warnings
+
+def obtener_productos(url):
+    try:
+        # Suprimir advertencias de solicitudes inseguras
+        warnings.filterwarnings("ignore", message="Unverified HTTPS request")
+        
+        # Realizar la solicitud GET a la URL con verificación SSL deshabilitada
+        response = requests.get(url, verify=False)
+        # Verificar si la solicitud fue exitosa
+        response.raise_for_status()
+        
+        # Parsear el contenido JSON de la respuesta
+        data = response.json()
+        
+        # Verificar si 'products' está en el JSON y es una lista
+        if 'products' in data and isinstance(data['products'], list):
+            productos = data['products']
+            # Imprimir los productos
+            for producto in productos:
+                print(f"ID: {producto.get('id', 'N/A')}")
+                print(f"Nombre: {producto.get('name', 'N/A')}")
+                print(f"Descripción: {producto.get('description', 'N/A')}")
+                print(f"Precio: {producto.get('price', 'N/A')} {producto.get('currency', 'N/A')}")
+                print(f"En stock: {'Sí' if producto.get('in_stock', False) else 'No'}")
+                print("-" * 20)
+        else:
+            print("El JSON recibido no contiene una lista de productos bajo la clave 'products'.")
+    
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+    except Exception as err:
+        print(f"Other error occurred: {err}")
+
+# URL de los productos
+url = "https://jsonkeeper.com/b/MX0A"
+
+# Llamar a la función para obtener e imprimir los productos
+obtener_productos(url)
